@@ -114,3 +114,30 @@ class B:
                 tmp = IR(opcode, val1, val2)
                 self.irs.append(tmp)
                 return tmp
+class B:
+    def __init__(self, prev, nxt=None):
+        self.num = -1
+        self.prev = pre
+        self.next = nxt
+    def active(self):
+        if self.num == -1:
+            self.num = len(bbs)
+        bbs.append(self)
+class IfB(B):
+    def __init__(self, prev, nxt=None):
+        B.__init__(self, prev, nxt):
+        self.left = B()
+        self.right = B()
+        self.join = B()
+
+class WhileB(B):
+    def __init__(self, prev, nxt=None):
+        B.__init__(self, prev, nxt):
+        self.header = B()
+        self.body = B()
+        self.end = B()
+
+
+ir_num = 1
+bbs = [BB(0), BB(1)]
+flow = ["BB0:s -> BB1:n"]
