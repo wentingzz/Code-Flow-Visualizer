@@ -141,3 +141,112 @@ class WhileB(B):
 ir_num = 1
 bbs = [BB(0), BB(1)]
 flow = ["BB0:s -> BB1:n"]
+class regularTok:
+    def __init__(self, s, idx = 0):
+        self.s = s
+        self.idx = idx
+    def skip(self):
+        while self.s[self.idx] == " ":
+            self.idx += 1
+    def ident(self):
+        self.skip()
+        # print("Id",self.s[self.idx:])
+        if self.s[self.idx].isalpha():
+            res = self.idx
+            while self.idx < len(self.s) and self.s[self.idx].isalnum():
+                self.idx += 1
+            v = self.s[res:self.idx]
+            return v
+    def number(self, bb):
+        self.skip()
+        # print("Number",self.s[self.idx:])
+        if self.s[self.idx].isdigit():
+            res = self.idx
+            while self.idx < len(self.s) and self.s[self.idx].isdigit():
+                self.idx += 1
+            res = int(self.s[res:self.idx])
+            res = bb.addIR("const", res)
+            return res
+
+    def D(self, bb):
+        self.skip()
+        # print("D", self.s[self.idx:])
+        res = self.ident()
+        while self.s[self.idx] == "[":
+            self.idx += 1
+            self.E(bb)
+            self.idx += 1
+        return res
+    def F(self, bb):
+        self.skip()
+        res = 0
+        # print("F", self.s[self.idx:])
+        if self.s[self.idx] == "(":
+            self.idx += 1
+            res = self.E(bb)
+            self.idx += 1
+        elif self.s[self.idx].isdigit():
+            res = self.number(bb)
+            #TODO const
+        elif self.s[self.idx].isalpha():
+            if self.s[self.idx:].startswith("call "):
+                res = self.FC(bb)
+            else:
+                res = self.D(bb)
+                # print(res, bb)
+                if res in bb.var:
+                    return bb.var[res]
+                # res = lookup[self.ident()]
+        return res
+    def T(self, bb):
+        # print("T", self.s[self.idx:])
+        res = self.F(bb)
+        self.skip()
+        while self.idx < len(self.s) and self.s[self.idx] in ["*", "/"]:
+            mul = self.s[self.idx] == "*"
+            self.idx += 1
+            if mul:
+                res = bb.addIR("mul", res, self.F(bb))
+            else:
+                res = bb.addIR("div", res, self.F(bb))
+        return res
+    def E(self, bb):
+        # print("E", self.s[self.idx:])
+        self.skip()
+        res = self.T(bb)
+        self.skip()
+        while self.idx < len(self.s) and self.s[self.idx] in ["+", "-"]:
+            plus = self.s[self.idx] == "+"
+            self.idx += 1
+            if plus:
+                res = bb.addIR("add", res, self.T(bb))
+            else:
+                res = bb.addIR("sub", res, self.T(bb))
+        return res
+    def R(self, bb):
+        # print("R", self.s[self.idx:])
+        self.skip()
+        res = self.E(bb)
+        op = ""
+        self.skip()
+        if self.s[self.idx:].startswith("=="):
+            op = "bne"
+            self.idx += 2
+        elif self.s[self.idx:].startswith("!="):
+            op = "beq"
+            self.idx += 2
+        elif self.s[self.idx:].startswith("<="):
+            op = "bgt"
+            self.idx += 2
+        elif self.s[self.idx:].startswith(">="):
+            op = "blt"
+            self.idx += 2
+        elif self.s[self.idx:].startswith("<"):
+            op = "bge"
+            self.idx += 1
+        elif self.s[self.idx:].startswith(">"):
+            op = "ble"
+            self.idx += 1
+        self.skip()
+        res = bb.addIR("cmp", res, self.E(bb))
+        return bb.addIR(op, res, -1)
