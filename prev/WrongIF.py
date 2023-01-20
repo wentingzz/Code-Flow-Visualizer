@@ -250,3 +250,201 @@ class regularTok:
         self.skip()
         res = bb.addIR("cmp", res, self.E(bb))
         return bb.addIR(op, res, -1)
+class tokenizer(regularTok):
+    def A(self, bb):
+        self.idx = self.s.index("let ", self.idx) + 4
+        d = self.D(bb)
+        self.idx = self.s.index("<-", self.idx) + 2
+        e = self.E(bb)
+        bb.updatePhi(d,e)
+        bb.var[d] = e
+        return e
+    def FC(self, bb):
+        # print("FC", self.s[self.idx])
+        self.idx = self.s.index("call ", self.idx) + 5
+        name = self.ident()
+        if name == "InputNum":
+            res = bb.addIR("read")
+        self.idx = self.s.index("(", self.idx) + 1
+        self.skip()
+        if self.s[self.idx] != ")":
+            if name == "OutputNum":
+                res = bb.addIR("write", self.E(bb))
+            else:
+                self.E(bb)
+                self.skip()
+                while self.s[self.idx] == ",":
+                    self.idx += 1
+                    self.E(bb)
+                    self.skip()
+        self.idx = self.s.index(")", self.idx) + 1
+        return res
+    def IS(self, bb):
+        # print("IS", self.s[self.idx:])
+
+        self.idx = self.s.index("if ", self.idx) + 3
+        braIR = self.R(bb)
+        self.idx = self.s.index("then ", self.idx) + 5
+        left, right, join = BB(-1, bb, True), BB(-1, bb, False), BB(-1, bb)
+        if bb.join:
+            join.join, join.left = bb.join, bb.left
+        left.join, right.join = join, join
+        left.addToBBs()
+        flow.append(f"BB{bb.num}:s -> BB{left.num}:n [label=\"fall-through\"]")
+        left = self.SS(left)
+        left.addIR("bra", -1)
+        # print(f"Left: {left}\n{left.var}\nJoin: {join}\n{join.var}\n")
+
+        self.skip()
+        if self.s[self.idx:].startswith("else "):
+            self.idx += 5
+            right.addToBBs()
+            flow.append(f"BB{bb.num}:s -> BB{right.num}:n [label=\"branch\"]")
+            tmp = self.SS(right)
+            if len(right.irs) == 0:
+                right.addIR("")
+            braIR.val2 = right.irs[0]
+            right = tmp
+            # print(f"Right: {right}\n{right.var}\nJoin: {join}\n{join.var}\n")
+        else:
+            if len(join.irs) == 0:
+                join.addIR("")
+            braIR.val2 = join.irs[0]
+        left.irs[-1].val1 = join.irs[0]
+        join.phiPush()
+        join.addToBBs()
+        flow.append(f"BB{left.num}:s -> BB{join.num}:n [label=\"branch\"]")
+        if right.num > 0:
+            flow.append(f"BB{right.num}:s -> BB{join.num}:n [label=\"fall-through\"]")
+        else:
+            flow.append(f"BB{bb.num}:s -> BB{join.num}:n [label=\"fall-through\"]")
+        self.idx = self.s.index("fi", self.idx) + 2
+        return join
+    def loop(self, join, loop, idx):
+        jl, ll, maxI = 0, 0, 4
+        # tmp = join.var
+        while maxI and jl != len(join.irs) and ll != len(loop.irs):
+            jl, ll, loop.var = len(join.irs), len(loop.irs), dict(join.var)
+            # loop.join, join.loop = join, 0
+            print(f"\nThis {maxI} join {join.num}: {join.var}")
+            self.idx = idx
+            self.idx = self.s.index("do ", self.idx) + 3
+            self.SS(loop)
+            print(f"\nThis {maxI} loop {loop.num}: {loop.var}")
+            self.idx = self.s.index("od", self.idx) + 2
+            maxI -= 1
+            # print(jl, join, join.var)
+        # join.var = tmp
+        # join.phiPush()
+        return
+
+    def WS(self, bb):
+        # print("WS", self.s[self.idx:])
+        self.idx = self.s.index("while ", self.idx) + 6
+        startIdx = self.idx
+        join, loop, end = BB(-1, bb), BB(-1, bb, False), BB(-1, bb)
+        loop.join, join.loop = join, 0
+        join.addToBBs()
+        flow.append(f"BB{bb.num}:s -> BB{join.num}:n")
+        bra = self.R(join)
+        loop.addToBBs()
+        end.addToBBs()
+        flow.append(f"BB{join.num}:s -> BB{loop.num}:n [label=\"fall-through\"]")
+        flow.append(f"BB{loop.num}:s -> BB{join.num}:n [label=\"fall-through\"]")
+        flow.append(f"BB{join.num}:e -> BB{end.num}:n [label=\"follow\"]")
+        self.idx = self.s.index("do ", self.idx) + 3
+        print(f"\nThis Initial join {join.num}: {join.var}")
+        print(f"\nThis Initial loop {loop.num}: {loop.var}")
+        self.SS(loop)
+
+        self.idx = self.s.index("od", self.idx) + 2
+        self.loop(join, loop, startIdx)
+        end.var = join.var
+        # print(join.var, loop.var)
+        ir = end.addIR("")
+        bra.val2 = ir
+        if bb.join:
+            end.join = bb.join
+        return end
+    def RS(self, lookup):
+        self.idx = self.s.index("return ", self.idx) + 7
+        self.skip()
+        if not self.s[self.idx:].startswith(("let", "call", "if", "then", "else", "fi", "while","do", "od", "return")):
+            self.E(lookup)
+
+    def S(self, l):
+        self.skip()
+        # print("S", self.s[self.idx:])
+        if self.s[self.idx:].startswith("let "):
+            self.A(l)
+        elif self.s[self.idx:].startswith("call "):
+            self.FC(l)
+        elif self.s[self.idx:].startswith("if "):
+            l = self.IS(l)
+        elif self.s[self.idx:].startswith("while "):
+            l = self.WS(l)
+        elif self.s[self.idx:].startswith("return"):
+            self.RS(l)
+        return l
+    def SS(self, bb):
+        # print("SS", self.s[self.idx:])
+        # tmp = len(irs)
+        self.S(bb)
+        while self.s[self.idx] == ";":
+            self.idx += 1
+            bb = self.S(bb)
+        # if len(irs) == tmp:
+        #     irs.append(IR(""))
+        return bb
+
+    def TD(self, s):
+        if s.startswith("var"):
+            self.idx = self.s.index("var ", self.idx) + 4
+        else:
+            self.idx = self.s.index("array ", self.idx) + 6
+            #TODO more
+    def VD(self):
+        s = self.s[self.idx:].lstrip()
+        var = {}
+        while(s.startswith("var ") or s.startswith("array ")):
+            self.TD(s)
+            var[self.ident()] = None
+            while self.s[self.idx] == ",":
+                self.idx += 1
+                var[self.ident()] = None
+                self.skip()
+            self.idx = self.s.index(";", self.idx) + 1
+
+            s = self.s[self.idx:].lstrip()
+        return var
+
+# //     def FP(self):
+# //         start = self.s.index("(", self.idx) + 1
+# //         end = self.s.index(")", self.idx)
+# //         idList = self.s[start:end].split(",")
+# //         self.idx = end + 1
+
+# //     def FB(self):
+# //         self.VD()
+# //         self.idx = self.s.index("{", self.idx) + 1
+# //         self.SS()
+# //         self.idx = self.s.index("}", self.idx) + 1
+
+# //     def FD(self):
+# //         s = self.s[self.idx:].lstrip()
+# //         while s.startswith("void") or s.startswith("function"):
+# //             self.idx = self.s.index("function ", self.idx) + 9
+# //             self.ident()
+# //             self.FP()
+# //             self.idx += 1
+# //             self.FB()
+# //             self.idx += 1
+
+    def process(self):
+        bbs[-1].var = self.VD()
+        # self.FD()
+        self.skip()
+        if self.s[self.idx] == "{":
+            self.idx += 1
+            self.SS(bbs[-1])
+            self.idx = self.s.index("}", self.idx) + 1
