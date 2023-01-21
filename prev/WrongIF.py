@@ -448,3 +448,59 @@ class tokenizer(regularTok):
             self.idx += 1
             self.SS(bbs[-1])
             self.idx = self.s.index("}", self.idx) + 1
+def printGraph():
+    print("digraph G{")
+    for bb in bbs:
+        print(f"BB{bb.num} [shape=record, label=\"<b>{bb}\"];")
+    for f in flow:
+        print(f"{f};")
+    print("}")
+class parser:
+    def __init__(self, s):
+        if s.startswith("main"):
+            s = s[4:]
+        self.s = s
+
+    def computation(self):
+        t = tokenizer(self.s)
+        t.process()
+        # getIR("end")
+        printGraph()
+        for bb in bbs:
+            print(f"BB{bb.num}:{bb.var}")
+        # print(bbs[0])
+        # for bb in bbs[1:]:
+        #     print(bb)
+        # print(bbs[-1].var)
+        # print(flow)
+# s = input("Enter your input")
+# s = "main  var a, b  , c ;  var  n,  x,  j   ;  {let  a  <-  3  +   2;       if 1<= 2   then   let a <- a + 3 fi}"
+# s = ("main var a, b, c, d, e;  {let a <- call InputNum ( ); let b<- a ;"
+#      "let c   <- b; let d<-b+c; let e<- a+b;  "
+#      "if a < 0 then "
+#      "  let d <- d+e;   if d != 0  then let a <- d fi;"
+#      "  else   let d<-a; if e >= 1 then let e <- a else let e<-1 fi; let a <- c"
+#      "  fi;"
+#      "call OutputNum  ( a ) }"
+#     )
+# s = ("main var a,b,c,d,e; {let a<-call InputNum(); "
+#      "let b<-a; let c<-b; let d<- b+ c; let e <-a+b;"
+#      "if a<0 then let d<-d+e; let a<- d else let d<- e  fi;"
+#      " call OutputNum(a)}"
+# )
+s = ("main var x,y,i,j; {let i<-call InputNum(); "
+     "let x<-0; let y<-0; let j<- i; while x<10 do "
+     " let x <- i + 1; if x < 0 then let y <- j + 1 fi; let i <-i + 1 "
+     "od; call OutputNum(x)}"
+)
+
+# s = ("main var x,y,i,j; {let i<-call InputNum(); "
+#      "let x<-0; let y<-0; let j<- i; while x<10 do "
+#      " let x <- i + 1; let y <- j + 1; while j<10 do "
+#      " let x <- j + 1; let y <- i + 1; let j <-j + 1 "
+#      "od; let i <-i + 1 "
+#      "od; call OutputNum(x)}"
+# )
+
+p = parser(s)
+p.computation()
