@@ -35,3 +35,47 @@ class IR:
         self.op = opcode
         self.val1 = val1
         self.val2 = val2
+bbs = []
+class ArrayVar:
+    def __init__(self, names=[], size=None):
+        self.a = {}
+        if len(bbs) > 0:
+            self.size = size
+            for n in names:
+                self.a[n[0]] = [bbs[0].addIR("const", f"{n[0]}_adr"), None, n[1], {}]
+    def getCap(self, name):
+        return self.a[name][2]
+    def copy(self):
+        res = ArrayVar()
+        res.a = copy.deepcopy(self.a)
+        res.size = self.size
+        return res
+    def __repr__(self):
+        res = "Array:\n"
+        for name, v in self.a.items():
+            res += f"\t{name} at {v[1]} has {v[-1]}\n"
+        return res + "\n"
+    def get(self, name, idx):
+        if name in self.a and idx in self.a[name][-1]:
+            return self.a[name][-1][idx]
+        return None
+    def reset(self, name, idx = None):
+        if name in self.a:
+            if idx and idx in self.a[name][-1]:
+                tmp = self.a[name][-1][idx]
+                self.a[name][-1] = {}
+                self.a[name][-1][idx] = tmp
+            else:
+                self.a[name][-1] = {}
+    def getBase(self, name, bb):
+        if self.a[name][1] == None:
+            self.a[name][1] = bb.addIR("add", "#BASE", self.a[name][0])
+        return self.a[name][1]
+    def set(self, name, idx, val):
+        if name in self.a:
+            self.a[name][-1][idx] = val
+            # print(f"Set:\n\t{idx}\n\t{self.a[name][-1]}")
+            return val
+    def remove(self, name, idx):
+        if name in self.a:
+            self.a[name][-1][idx] = None
