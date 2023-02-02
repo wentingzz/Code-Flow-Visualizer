@@ -79,3 +79,74 @@ class ArrayVar:
     def remove(self, name, idx):
         if name in self.a:
             self.a[name][-1][idx] = None
+flow = ["BB0:s -> BB1:n"]
+class GeneralBB:
+    def __init__(self, bb_num, dom = None, left = None):
+        self.dom = dom
+        self.var = {}
+        if dom != None:
+            self.var = dict(dom.var)
+            self.a = dom.a.copy()
+        else:
+            self.a = ArrayVar()
+        self.irs = []
+        self.num = bb_num
+        self.left = left
+        self.join = None
+    def __repr__(self):
+        res = f"BB{self.num}| {{"
+        for ir in self.irs:
+            res += f" {ir} |"
+        return res[:-1]+"}}"
+    def setNum(self, num):
+        self.num = num
+    def addToBBs(self):
+        # print(f"Check BB Var: {bbs[-2].var}\n{bbs[-1].var}\n{self.var}")
+        if self.num == -1:
+            self.num = len(bbs)
+        bbs.append(self)
+        if self.dom:
+            flow.append(f"BB{self.dom.num}:b -> BB{self.num}:n [color=blue,style=dotted,label=\"dom\"]")
+    def addIR(self, opcode, val1=None, val2=None):
+        if len(self.irs) == 1 and opcode != "const" and self.irs[0].op == "":
+            self.irs[0].set(opcode, val1, val2)
+            return self.irs[0]
+        if opcode.startswith("b"):
+            tmp = IR(opcode, val1, val2)
+            self.irs.append(tmp)
+            return tmp
+        # elif opcode.startswith("phi"):
+        #     tmp = IR(opcode, val1, val2)
+        #     self.irs.append(tmp)
+        #     return tmp
+        if opcode == "const":
+            for x in bbs[0].irs:
+                if x.op == opcode and x.val1 == val1:
+                    return x
+            else:
+                tmp = IR(opcode, val1, val2)
+                bbs[0].irs.append(tmp)
+                return tmp
+        else:
+            for x in self.irs:
+                if x.op == opcode and x.val1 == val1 and x.val2 == val2:
+                    return x
+            else:
+                tmp = IR(opcode, val1, val2)
+                self.irs.append(tmp)
+                return tmp
+    def computeIdx(self, name, idx):
+        res, cap = None, self.a.getCap(name)
+        if len(cap) > 1:
+            for i in range(len(idx)):
+                if isinstance(cap[i], int) and cap[i] != 1:
+                    cap[i] = bbs[0].addIR("const", cap[i])
+                if res != None:
+                    if isinstance(cap[i], IR):
+                        res = self.addIR("add", res, self.addIR("mul", cap[i], idx[i]))
+                    else:
+                        res = self.addIR("add", res, idx[i])
+                else:
+                    res = self.addIR("mul", cap[i], idx[i])
+            return res
+        return idx[0]
