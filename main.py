@@ -150,3 +150,87 @@ class GeneralBB:
                     res = self.addIR("mul", cap[i], idx[i])
             return res
         return idx[0]
+class BB(GeneralBB):
+    def __init__(self, bb_num, dom = None, left = None):
+        GeneralBB.__init__(self, bb_num, dom, left)
+        self.rec = True
+    def setRec(self, isRec):
+        self.rec = isRec
+    def setA(self, d, idx, val):
+        tIdx = tuple(idx)
+        self.resetA(d, tIdx)
+        res = self.a.get(d, tIdx)
+        if res:
+            location = res.val1
+        else:
+            idx = self.computeIdx(d, idx)
+            offset = self.addIR("mul", idx, self.a.size)
+            base = self.a.getBase(d, self)
+
+            location = self.addIR("adda", offset, base)
+            # print(f"SetA:{d} at {idx} \n\t{base} \n\t{location}\n\t{val}")
+        return self.a.set(d, tIdx, self.addIR("store", location, val))
+    def getA(self, name, idx):
+        tidx = tuple(idx)
+        res = self.a.get(name, tidx)
+        if not res:
+            idx = self.computeIdx(name, idx)
+            offset = self.addIR("mul", idx, self.a.size)
+            base = self.a.getBase(name, self)
+            location = self.addIR("adda", offset, base)
+            res = self.a.set(name, tidx, self.addIR("load", location))
+            # print(f"GetA: \n\t{base} \n\t{location}\n\t{res}")
+        return res
+    def resetA(self, name, idx=[]):     #reset self.a[name] except key = idx and reset all its join BB recursively
+        self.a.reset(name, tuple(idx))
+        if self.join and self.rec:
+            self.join.addIR("kill", name)
+            self.join.resetA(name)
+            # print(self.num, self.join.a)
+    # def removeA(self, name, idx):       #remove self.a[name][idx]
+    #     # idx = self.computeIdx(name,idx)
+    #     self.a.remove(name, tuple(idx))
+    #     if self.join and self.rec:
+    #         self.join.a.remove(name, idx)
+    def phiPush(self, phis = None):
+        #set instructions with "phiTBD" to "phi" and update its join BB
+        for key in self.var.keys():
+            if self.var[key] and self.var[key].op == f"phiTBD{self.num}":
+                if self.rec and self.join:
+                    self.updatePhi(key, self.var[key])
+                self.var[key].op = "phi"
+        #add additional phis to the join BB if there exists any
+        if self.rec and phis:
+            for k, v in phis.items():
+                self.updatePhi(k,v)
+    def updatePhi(self, d, e):
+        if not self.join:
+            return
+        # print(f"Phi: {d}, {e}, BB{self.join.num}, {self.join.var}")
+        if self.left:
+            #add/update instruction "phiTBD" to its join BB with val1
+            if self.join.var[d].op == f"phiTBD{self.join.num}":
+                self.join.var[d].val1 = e
+            else:
+                ir = self.join.addIR(f"phiTBD{self.join.num}", e, self.join.var[d])
+                self.join.var[d] = ir
+                if self.rec:    #update phi recursively
+                    self.join.updatePhi(d, ir)
+        else:
+            #add/update instruction "phiTBD" to its join BB with val2
+            if self.join.var[d].op == f"phiTBD{self.join.num}":
+                self.join.var[d].val2 = e
+                ir = self.join.var[d]
+            else:
+                ir = self.join.addIR(f"phiTBD{self.join.num}", self.join.var[d], e)
+                self.join.var[d] = ir
+                if self.rec:    #update phi recursively
+                    self.join.updatePhi(d, ir)
+        # print(f"After Phi: {d}, {e}, {self.join.var}")
+    def addPhis(self, phis):    #used in while loop to add "phiTBD" to current BB
+        for d in phis.keys():
+            ir = self.addIR(f"phiTBD{self.num}", self.var[d], ir_num)
+            phis[d] = ir
+            self.var[d] = ir
+        return phis
+
