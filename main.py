@@ -234,3 +234,23 @@ class BB(GeneralBB):
             self.var[d] = ir
         return phis
 
+ir_num = 0
+bbs += [BB(0), BB(1)]
+class regularTok:
+    def __init__(self, s, idx = 0):
+        self.s = s
+        self.idx = idx
+    def skip(self):
+        while self.s[self.idx] == " ":
+            self.idx += 1
+    def skipTo(self, c):
+        self.idx = self.s.index(c, self.idx) + len(c)
+    def ident(self):
+        self.skip()
+        # print("Id",self.s[self.idx:])
+        if self.s[self.idx].isalpha():
+            res = self.idx
+            while self.idx < len(self.s) and self.s[self.idx].isalnum():
+                self.idx += 1
+            v = self.s[res:self.idx]
+            return v
