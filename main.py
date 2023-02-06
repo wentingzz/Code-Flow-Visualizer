@@ -254,3 +254,15 @@ class regularTok:
                 self.idx += 1
             v = self.s[res:self.idx]
             return v
+    def number(self, bb, add=True):
+        self.skip()
+        # print("Number",self.s[self.idx:])
+        if self.s[self.idx].isdigit():
+            res = self.idx
+            while self.idx < len(self.s) and self.s[self.idx].isdigit():
+                self.idx += 1
+            res = int(self.s[res:self.idx])
+            if add:
+                res = bb.addIR("const", res)
+            return res
+
