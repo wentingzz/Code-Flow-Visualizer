@@ -266,3 +266,14 @@ class regularTok:
                 res = bb.addIR("const", res)
             return res
 
+    def D(self, bb):
+        self.skip()
+        # print("D", self.s[self.idx:])
+        res, idx = self.ident(), []
+        self.skip()
+        while self.s[self.idx] == "[":
+            self.idx += 1
+            idx.append(self.E(bb))
+            self.skipTo("]")
+            self.skip()
+        return (res, idx)
