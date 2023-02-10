@@ -299,3 +299,15 @@ class regularTok:
                     return bb.var[res]
                 # res = lookup[self.ident()]
         return res
+    def T(self, bb):
+        # print("T", self.s[self.idx:])
+        res = self.F(bb)
+        self.skip()
+        while self.idx < len(self.s) and self.s[self.idx] in ["*", "/"]:
+            mul = self.s[self.idx] == "*"
+            self.idx += 1
+            if mul:
+                res = bb.addIR("mul", res, self.F(bb))
+            else:
+                res = bb.addIR("div", res, self.F(bb))
+        return res
