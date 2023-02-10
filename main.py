@@ -277,3 +277,25 @@ class regularTok:
             self.skipTo("]")
             self.skip()
         return (res, idx)
+    def F(self, bb):
+        self.skip()
+        res = 0
+        # print("F", self.s[self.idx:])
+        if self.s[self.idx] == "(":
+            self.idx += 1
+            res = self.E(bb)
+            self.skipTo(")")
+        elif self.s[self.idx].isdigit():
+            res = self.number(bb)
+            #TODO const
+        elif self.s[self.idx].isalpha():
+            if self.s[self.idx:].startswith("call "):
+                res = self.FC(bb)
+            else:
+                res,idx = self.D(bb)
+                if idx:
+                    return bb.getA(res, idx)
+                elif res in bb.var:
+                    return bb.var[res]
+                # res = lookup[self.ident()]
+        return res
