@@ -311,3 +311,16 @@ class regularTok:
             else:
                 res = bb.addIR("div", res, self.F(bb))
         return res
+    def E(self, bb):
+        # print("E", self.s[self.idx:])
+        self.skip()
+        res = self.T(bb)
+        self.skip()
+        while self.idx < len(self.s) and self.s[self.idx] in ["+", "-"]:
+            plus = self.s[self.idx] == "+"
+            self.idx += 1
+            if plus:
+                res = bb.addIR("add", res, self.T(bb))
+            else:
+                res = bb.addIR("sub", res, self.T(bb))
+        return res
