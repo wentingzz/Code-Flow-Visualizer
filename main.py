@@ -352,3 +352,15 @@ class regularTok:
         self.skip()
         res = bb.addIR("cmp", res, self.E(bb))
         return bb.addIR(op, res, -1)
+class tokenizer(regularTok):
+    def A(self, bb):
+        self.skipTo("let ")
+        d, idx = self.D(bb)
+        self.skipTo("<-")
+        e = self.E(bb)
+        if idx:
+            bb.setA(d, idx, e)
+        else:
+            bb.updatePhi(d,e)
+            bb.var[d] = e
+        return e
