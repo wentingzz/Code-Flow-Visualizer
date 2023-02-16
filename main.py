@@ -324,3 +324,31 @@ class regularTok:
             else:
                 res = bb.addIR("sub", res, self.T(bb))
         return res
+    def R(self, bb):
+        # print("\nR", self.s[self.idx:])
+        self.skip()
+        res = self.E(bb)
+        # print("R", res, bb.irs)
+        op = ""
+        self.skip()
+        if self.s[self.idx:].startswith("=="):
+            op = "bne"
+            self.idx += 2
+        elif self.s[self.idx:].startswith("!="):
+            op = "beq"
+            self.idx += 2
+        elif self.s[self.idx:].startswith("<="):
+            op = "bgt"
+            self.idx += 2
+        elif self.s[self.idx:].startswith(">="):
+            op = "blt"
+            self.idx += 2
+        elif self.s[self.idx:].startswith("<"):
+            op = "bge"
+            self.idx += 1
+        elif self.s[self.idx:].startswith(">"):
+            op = "ble"
+            self.idx += 1
+        self.skip()
+        res = bb.addIR("cmp", res, self.E(bb))
+        return bb.addIR(op, res, -1)
