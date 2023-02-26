@@ -364,3 +364,20 @@ class tokenizer(regularTok):
             bb.updatePhi(d,e)
             bb.var[d] = e
         return e
+    def FC(self, bb):
+        # print("FC", self.s[self.idx])
+        self.skipTo("call ")
+        name = self.ident()
+        if name == "InputNum":
+            res = bb.addIR("read")
+        elif name == "OutputNum":
+            self.skipTo("(")
+            self.skip()
+            res = bb.addIR("write", self.E(bb))
+        elif name == "OutputNewLine":
+            res = bb.addIR("writeNL")
+        else:
+            print("No user defined function")
+            exit(0)
+        self.skipTo(")")
+        return res
