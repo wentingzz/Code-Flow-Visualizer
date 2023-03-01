@@ -381,3 +381,20 @@ class tokenizer(regularTok):
             exit(0)
         self.skipTo(")")
         return res
+    def IS(self, bb):
+        self.skipTo("if")
+        braIR = self.R(bb)
+
+        self.skipTo("then")
+        left, right, join = BB(-1, bb, True), BB(-1, bb, False), BB(-1, bb)
+        if bb.join:
+            join.join, join.left = bb.join, bb.left
+        left.join, right.join = join, join
+        left.addToBBs()
+        flow.append(f"BB{bb.num}:s -> BB{left.num}:n [label=\"fall-through\"]")
+        left = self.SS(left)
+
+        left.addIR("bra", -1)
+        if len(join.irs) == 0:
+            join.addIR("")
+        self.skip()
