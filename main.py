@@ -398,3 +398,16 @@ class tokenizer(regularTok):
         if len(join.irs) == 0:
             join.addIR("")
         self.skip()
+        if self.s[self.idx:].startswith("else "):
+            self.idx += 5
+            right.addToBBs()
+            flow.append(f"BB{bb.num}:s -> BB{right.num}:n [label=\"branch\"]")
+            tmp = self.SS(right)
+            if len(right.irs) == 0:
+                right.addIR("")
+            braIR.val2 = right.irs[0]
+            right = tmp
+        else:
+            braIR.val2 = join.irs[0]
+        left.irs[-1].val1 = join.irs[0]
+
