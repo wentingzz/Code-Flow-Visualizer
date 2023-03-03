@@ -411,3 +411,12 @@ class tokenizer(regularTok):
             braIR.val2 = join.irs[0]
         left.irs[-1].val1 = join.irs[0]
 
+        join.phiPush()
+        join.addToBBs()
+        flow.append(f"BB{left.num}:s -> BB{join.num}:n [label=\"branch\"]")
+        if right.num > 0:
+            flow.append(f"BB{right.num}:s -> BB{join.num}:n [label=\"fall-through\"]")
+        else:
+            flow.append(f"BB{bb.num}:s -> BB{join.num}:n [label=\"branch\"]")
+        self.skipTo("fi")
+        return join
