@@ -420,3 +420,23 @@ class tokenizer(regularTok):
             flow.append(f"BB{bb.num}:s -> BB{join.num}:n [label=\"branch\"]")
         self.skipTo("fi")
         return join
+    def preprocess(self, bb):
+        start = self.idx
+        stack = ["od"]
+        var, a = {}, []
+        while stack:
+            if self.s[self.idx:].startswith("let "):
+                self.idx += 4
+                d, idx = self.D(bb)
+                if not idx:
+                    var[d] = None
+                else:
+                    a.append([d,idx])
+            elif self.s[self.idx:].startswith("while "):
+                self.idx += 6
+                stack.append("od")
+            elif self.s[self.idx:].startswith(" od"):
+                stack.pop()
+            self.idx += 1
+        self.idx = start
+        return (var, a)
