@@ -476,3 +476,24 @@ class tokenizer(regularTok):
         end.addToBBs()
         flow.append(f"BB{join.num}:s -> BB{end.num}:n [label=\"follow\"]")
 
+        join.phiPush()
+        self.skipTo("od")
+        # end.var = join.var
+        # print(join.var, loop.var)
+        if len(end.irs) == 0:
+            ir = end.addIR("")
+        else:
+            ir = end.irs[0]
+        bra.val2 = ir
+
+        if bb.join:
+            end.join, end.left = bb.join, bb.left
+        end.phiPush(phis)   # update phi with additional phis from preprocessed step
+
+        return end
+    # def RS(self, lookup):
+    #     self.skipTo("return ")
+    #     self.skip()
+    #     if not self.s[self.idx:].startswith(("let", "call", "if", "then", "else", "fi", "while","do", "od", "return")):
+    #         self.E(lookup)
+
