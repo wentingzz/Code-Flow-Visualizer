@@ -440,3 +440,16 @@ class tokenizer(regularTok):
             self.idx += 1
         self.idx = start
         return (var, a)
+    def WS(self, bb):
+        self.skipTo("while ")
+        phis, arrays = self.preprocess(bb)
+
+        join = BB(-1, bb)
+        join.addToBBs()
+        phis = join.addPhis(phis)
+        # kill array if it's assigned in the while loop
+        for a in arrays:
+            join.addIR("kill", a[0])
+            join.resetA(a[0])
+        flow.append(f"BB{bb.num}:s -> BB{join.num}:n")
+        # print(join.var)
