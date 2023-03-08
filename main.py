@@ -453,3 +453,26 @@ class tokenizer(regularTok):
             join.resetA(a[0])
         flow.append(f"BB{bb.num}:s -> BB{join.num}:n")
         # print(join.var)
+        bra = self.R(join)
+        # print(join.var)
+        # print(f"Join:{join.a}")
+        loop = BB(-1, join, False)
+        loop.join = join
+        loop.addToBBs()
+        loop.setRec(False)  #preprocessed. No need to recursively update phis
+
+        flow.append(f"BB{join.num}:s -> BB{loop.num}:n [label=\"fall-through\"]")
+
+
+        # print(f"\nThis Initial join {join.num}: {join.var}")
+        # print(f"\nThis Initial loop {loop.num}: {loop.a}")
+        self.skipTo("do ")
+        loop = self.SS(loop)
+        flow.append(f"BB{loop.num}:s -> BB{join.num}:n [label=\"fall-through\"]")
+
+        end = BB(-1, join)
+        # print(f"End:\n\t{arrays}\n\t{end.a}")
+        # print(f"End:\n\t{end.a}")
+        end.addToBBs()
+        flow.append(f"BB{join.num}:s -> BB{end.num}:n [label=\"follow\"]")
+
