@@ -497,3 +497,24 @@ class tokenizer(regularTok):
     #     if not self.s[self.idx:].startswith(("let", "call", "if", "then", "else", "fi", "while","do", "od", "return")):
     #         self.E(lookup)
 
+    def S(self, l):
+        self.skip()
+        # print("S", self.s[self.idx:])
+        if self.s[self.idx:].startswith("let "):
+            self.A(l)
+        elif self.s[self.idx:].startswith("call "):
+            self.FC(l)
+        elif self.s[self.idx:].startswith("if "):
+            l = self.IS(l)
+        elif self.s[self.idx:].startswith("while "):
+            l = self.WS(l)
+        # elif self.s[self.idx:].startswith("return"):
+        #     self.RS(l)
+        return l
+    def SS(self, bb):
+        self.S(bb)
+        while self.s[self.idx] == ";":
+            self.idx += 1
+            bb = self.S(bb)
+        return bb
+
