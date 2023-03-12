@@ -518,3 +518,22 @@ class tokenizer(regularTok):
             bb = self.S(bb)
         return bb
 
+    def TD(self, s):
+        if s.startswith("var"):
+            self.skipTo("var ")
+            return (True, None)
+        else:
+            self.skipTo("[")
+            cap = []
+            self.number(None, False)
+            self.skipTo("]")
+            self.skip()
+            while self.s[self.idx] == "[":
+                self.idx += 1
+                n = self.number(None, False)
+                cap = [x * n for x in cap]
+                cap.append(n)
+                self.skipTo("]")
+                self.skip()
+            cap.append(1)
+            return (False, cap)
