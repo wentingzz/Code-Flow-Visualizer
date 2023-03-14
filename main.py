@@ -550,3 +550,15 @@ class tokenizer(regularTok):
                     var[self.ident()] = None
                     self.skip()
             else:
+                name.append((self.ident(), cap))
+                size = bbs[0].addIR("const", ARRAY_SIZE)
+                while self.s[self.idx] == ",":
+                    self.idx += 1
+                    name.append((self.ident(), cap))
+                    self.skip()
+            self.skipTo(";")
+            s = self.s[self.idx:].lstrip()
+        bbs[-1].var = var
+        bbs[-1].a = ArrayVar(name, size)
+        return var
+
