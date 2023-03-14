@@ -537,3 +537,16 @@ class tokenizer(regularTok):
                 self.skip()
             cap.append(1)
             return (False, cap)
+    def VD(self):
+        s = self.s[self.idx:].lstrip()
+        var = {}
+        name, size = [], None
+        while(s.startswith("var ") or s.startswith("array")):
+            isVar, cap = self.TD(s)
+            if isVar:
+                var[self.ident()] = None
+                while self.s[self.idx] == ",":
+                    self.idx += 1
+                    var[self.ident()] = None
+                    self.skip()
+            else:
