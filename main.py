@@ -562,3 +562,13 @@ class tokenizer(regularTok):
         bbs[-1].a = ArrayVar(name, size)
         return var
 
+    def process(self):
+        self.skipTo("main ")
+        self.VD()
+        # self.FD()
+        self.skip()
+        if self.s[self.idx] == "{":
+            self.idx += 1
+            b = self.SS(bbs[-1])
+            self.skipTo("}")
+            b.addIR("end")
