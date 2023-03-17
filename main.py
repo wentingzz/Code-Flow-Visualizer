@@ -572,3 +572,14 @@ class tokenizer(regularTok):
             b = self.SS(bbs[-1])
             self.skipTo("}")
             b.addIR("end")
+def printGraph():
+    res = "digraph G{"
+    for bb in bbs:
+        res += f"BB{bb.num} [shape=record, label=\"<b>{bb}\"];"
+    for f in flow:
+        res += f"{f};"
+    res += "}"
+    print(res)
+    # src = graphviz.Source(res)
+    # doctest_mark_exe()
+    # src.render('doctest-output/holy-grenade.gv', view=True).replace('\\', '/')
