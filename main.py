@@ -583,3 +583,13 @@ def printGraph():
     # src = graphviz.Source(res)
     # doctest_mark_exe()
     # src.render('doctest-output/holy-grenade.gv', view=True).replace('\\', '/')
+class parser:
+    def __init__(self, s):
+        s = s.replace("\n", " ")
+        s = s.replace("\t", " ")
+        self.s = s
+
+    def computation(self):
+        t = tokenizer(self.s)
+        t.process()
+        printGraph()
