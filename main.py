@@ -593,3 +593,36 @@ class parser:
         t = tokenizer(self.s)
         t.process()
         printGraph()
+
+s = """
+main
+var a, b, c, d, e;  
+array[3] x;
+{
+    let a <- call InputNum ( ); 
+    let b<- a ;
+    let c   <- b; 
+    let d<-b+c; 
+    let e<- a+b;
+    let x[a] <- d;
+    if a < 0 then 
+        let d <- d+e;   
+        if d != 0 then 
+            let a <- d;
+            let x[a] <- c
+        fi; 
+    else   
+        let d<-a; 
+        if e >= 1 then 
+            let e <- x[a]
+        else 
+            let e<-1 
+        fi; 
+        let a <- c 
+    fi; 
+    call OutputNum  ( a );
+    call OutputNum  ( x[a] );
+}.
+"""
+p = parser(s)
+p.computation()
