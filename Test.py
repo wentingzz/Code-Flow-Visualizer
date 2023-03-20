@@ -31,5 +31,24 @@ class Test:
             fi; 
             call OutputNum  ( a ) 
         }."""
+        # ---------------------------------Simple if-------------------------
+        # s = """
+        # main
+        # var a,b,c,d,e;
+        # {
+        #     let a<-call InputNum();
+        #     let b<-a;
+        #     let c<-b;
+        #     let d<- b+ c;
+        #     let e <-a+b;
+        #     if a<0 then
+        #         let d<-d+e;
+        #         let a<- d
+        #     else
+        #         let d<- e
+        #     fi;
+        #     call OutputNum(a)
+        # }."""
+
 
         self.s = s
