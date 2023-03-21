@@ -71,4 +71,26 @@ class Test:
             call OutputNum(x)
         }."""
 
+        # -----------------------------------While in If-------------------
+        # s = """
+        # main
+        # var x,y,i,j;
+        # {
+        #     let i<-call InputNum();
+        #     let x<-0;
+        #     let y<-0;
+        #     let j<- i;
+        #     if j < 0 then
+        #         let j <- x + 1;
+        #         let x <- i + 1;
+        #         while x<10 do
+        #             let x <- j + 1 ;
+        #             let y <- i + 1
+        #         od;
+        #     else
+        #         let i <-i + 1
+        #     fi;
+        #     call OutputNum(x)
+        # }."""
+
         self.s = s
