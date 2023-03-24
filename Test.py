@@ -113,5 +113,27 @@ class Test:
         #     od;
         #     call OutputNum(x)
         # }."""
-
+        # --------------------------------3 nested while loop------------------------
+        # s = """
+        # main
+        # var x,y,i,j;
+        # {
+        #     let i<-call InputNum();
+        #     let x<-0;
+        #     let y<-0;
+        #     let j<- i;
+        #     while x<10 do
+        #         let x <- i + 1;
+        #         let y <- j + 1;
+        #         while j<10 do
+        #             let x <- j + 1;
+        #             while i < 10 do
+        #                 let y <- i + 1
+        #             od;
+        #             let j <-j + 1
+        #         od;
+        #         let i <-i + 1
+        #     od;
+        #     call OutputNum(x)
+        # }."""
         self.s = s
