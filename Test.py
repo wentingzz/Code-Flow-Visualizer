@@ -136,4 +136,21 @@ class Test:
         #     od;
         #     call OutputNum(x)
         # }."""
+        # ---------------------------Simple Array in If-----------------------
+        # s = """
+        # main
+        # var a, b;
+        # array[4] x;
+        # {
+        #     let a <- call InputNum ();
+        #     let b <- a;
+        #     let x[a] <- b + 2;
+        #     if b<= 2 then
+        #         let b <- x[a] + 2
+        #     else
+        #         let b <- x[b] + 2
+        #     fi;
+        #     call OutputNum(x[a])
+        # }."""
+
         self.s = s
