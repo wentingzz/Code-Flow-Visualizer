@@ -188,4 +188,23 @@ class Test:
         #     call OutputNum(x);
         #     call OutputNum(a[x])
         # }."""
+        # -------------------Array assignment in while with same index and same value------------------
+        # s = """
+        # main
+        # var x,y,i,j;
+        # array[4] a;
+        # {
+        #     let i<-call InputNum();
+        #     let x<-0;
+        #     let y<-0;
+        #     let j<-i;
+        #     let a[x] <- i;
+        #     while i<10 do
+        #         let j <- i + 1;
+        #         let a[x] <- x + 1;
+        #         let i <-i + 1
+        #     od;
+        #     call OutputNum(x);
+        #     call OutputNum(a[x])
+        # }."""
         self.s = s
