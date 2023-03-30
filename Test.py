@@ -246,4 +246,23 @@ class Test:
         #     call OutputNum(x);
         #     call OutputNum(a[x])
         # }."""
+
+        # --------------------Multidimensional Array in While-----------------------
+        # s = """
+        # main
+        # var x,y,i,j;
+        # array[4][3][2] a;
+        # {
+        #     let i<-call InputNum();
+        #     let x<-0;
+        #     let y<-0;
+        #     let j<-i;
+        #     let a[x][i] <- i;
+        #     while i<10 do
+        #         let j <- i + 1;
+        #         let y <- a[x][i] + 1;
+        #     od;
+        #     call OutputNum(x);
+        #     call OutputNum(a[x][i])
+        # }."""
         self.s = s
