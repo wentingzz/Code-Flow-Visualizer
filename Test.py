@@ -265,4 +265,23 @@ class Test:
         #     call OutputNum(x);
         #     call OutputNum(a[x][i])
         # }."""
+
+        # s = """
+        # main
+        # var x,y,i,j;
+        # array[4][3][2] a;
+        # {
+        #     let i<-call InputNum();
+        #     let x<-0;
+        #     let y<-0;
+        #     let j<-i;
+        #     let a[x][j] <- i;
+        #     while j<10 do
+        #         let j <- i + 1;
+        #         let a[x][j] <- a[x][j] + 1;
+        #         let y <-i + 1
+        #     od;
+        #     call OutputNum(y);
+        #     call OutputNum(a[x][i])
+        # }."""
         self.s = s
