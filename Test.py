@@ -331,4 +331,30 @@ class Test:
         #     call OutputNum(i);
         #     call OutputNum(a[x][j])
         # }."""
+
+        # -----------------------------------If in While-------------------
+        # s = """main
+        # var x,y,i,j;
+        # array[4][3] a;
+        # {
+        #     let i<-call InputNum();
+        #     let x<-0;
+        #     let y<-0;
+        #     let j<- i;
+        #     let a[x][j] <- i;
+        #     while x<10 do
+        #         let x <- i + 1;
+        #         if x > 0 then
+        #             let x <- j + 1
+        #         else
+        #             let y <- a[x][j] + 1
+        #         fi;
+        #         let i <-i + 1
+        #     od;
+        #     call OutputNum(x);
+        #     call OutputNum(y);
+        #     call OutputNum(j);
+        #     call OutputNum(i);
+        #     call OutputNum(a[x][j])
+        # }."""
         self.s = s
