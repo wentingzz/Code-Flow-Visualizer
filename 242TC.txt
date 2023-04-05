@@ -1,0 +1,303 @@
+s = """
+        main 
+        var x,y,i,j; 
+        array[4] a; 
+        {
+            let i<-call InputNum(); 
+            let x<-0; 
+            let y<-0; 
+            let j<-i; 
+            let a[x] <- i; 
+            while i<10 do 
+                let j <- i + 1; 
+                while y < 0 do
+                    let y <- a[x] + 1;
+                    while a[x] < 10 do
+                        let a[x] <- a[x] + 1
+                    od;
+                od;
+                let i <-i + 1 
+            od; 
+            call OutputNum(x); 
+            call OutputNum(y); 
+            call OutputNum(j);
+            call OutputNum(i);
+            call OutputNum(a[x])
+        }."""
+
+digraph G{
+BB0 [shape=record, label="<b>BB0| { 0: const #4 | 1: const a_adr | 3: const #0 | 12: const #10 | 15: const #1 }}"];
+BB1 [shape=record, label="<b>BB1| { 2: read | 4: mul (3) (0) | 5: add #BASE (1) | 6: adda (4) (5) | 7: store (6) (2) }}"];
+BB2 [shape=record, label="<b>BB2| { 8: phi (2) (16) | 9: phi (3) (17) | 10: phi (2) (34) | 11: kill a | 13: cmp (10) (12) | 14: bge (13) (35) }}"];
+BB3 [shape=record, label="<b>BB3| { 16: add (10) (15) }}"];
+BB4 [shape=record, label="<b>BB4| { 17: phi (9) (24) | 18: kill a | 19: cmp (17) (3) | 20: bge (19) (34) }}"];
+BB5 [shape=record, label="<b>BB5| { 21: mul (3) (0) | 22: adda (21) (5) | 23: load (22) | 24: add (23) (15) }}"];
+BB6 [shape=record, label="<b>BB6| { 25: kill a | 26: mul (3) (0) | 27: adda (26) (5) | 28: load (27) | 29: cmp (28) (12) | 30: bge (29) (33) }}"];
+BB7 [shape=record, label="<b>BB7| { 31: add (28) (15) | 32: store (27) (31) }}"];
+BB8 [shape=record, label="<b>BB8| { 33:  }}"];
+BB9 [shape=record, label="<b>BB9| { 34: add (10) (15) }}"];
+BB10 [shape=record, label="<b>BB10| { 35: write (3) | 36: write (9) | 37: write (8) | 38: write (10) | 39: mul (3) (0) | 40: adda (39) (5) | 41: load (40) | 42: write (41) | 43: end }}"];
+BB0:s -> BB1:n;
+BB1:b -> BB2:n [color=blue,style=dotted,label="dom"];
+BB1:s -> BB2:n;
+BB2:b -> BB3:n [color=blue,style=dotted,label="dom"];
+BB2:s -> BB3:n [label="fall-through"];
+BB3:b -> BB4:n [color=blue,style=dotted,label="dom"];
+BB3:s -> BB4:n;
+BB4:b -> BB5:n [color=blue,style=dotted,label="dom"];
+BB4:s -> BB5:n [label="fall-through"];
+BB5:b -> BB6:n [color=blue,style=dotted,label="dom"];
+BB5:s -> BB6:n;
+BB6:b -> BB7:n [color=blue,style=dotted,label="dom"];
+BB6:s -> BB7:n [label="fall-through"];
+BB7:s -> BB6:n [label="fall-through"];
+BB6:b -> BB8:n [color=blue,style=dotted,label="dom"];
+BB6:s -> BB8:n [label="follow"];
+BB8:s -> BB4:n [label="fall-through"];
+BB4:b -> BB9:n [color=blue,style=dotted,label="dom"];
+BB4:s -> BB9:n [label="follow"];
+BB9:s -> BB2:n [label="fall-through"];
+BB2:b -> BB10:n [color=blue,style=dotted,label="dom"];
+BB2:s -> BB10:n [label="follow"];
+}
+> 
+
+
+
+s = """
+        main 
+        var x,y,i,j; 
+        array[4][3][2] a; 
+        {
+            let i<-call InputNum(); 
+            let x<-0; 
+            let y<-0; 
+            let j<-i; 
+            let a[x][j][i] <- i; 
+            while j<10 do 
+                let j <- i + 1; 
+                while y < 0 do
+                    let y <- a[x][j] + i;
+                    while i < 10 do
+                        let i <- a[x][j] + i
+                    od;
+                od;
+                let y <- y + 1 
+            od; 
+            call OutputNum(x); 
+            call OutputNum(y); 
+            call OutputNum(j);
+            call OutputNum(i);
+            call OutputNum(a[x][j])
+        }."""
+
+digraph G{
+BB0 [shape=record, label="<b>BB0| { 0: const #4 | 1: const a_adr | 3: const #0 | 4: const #6 | 6: const #2 | 17: const #10 | 20: const #1 }}"];
+BB1 [shape=record, label="<b>BB1| { 2: read | 5: mul (4) (3) | 7: mul (6) (2) | 8: add (5) (7) | 9: add (8) (2) | 10: mul (9) (0) | 11: add #BASE (1) | 12: adda (10) (11) | 13: store (12) (2) }}"];
+BB2 [shape=record, label="<b>BB2| { 14: phi (2) (21) | 15: phi (3) (38) | 16: phi (2) (23) | 18: cmp (14) (17) | 19: bge (18) (39) }}"];
+BB3 [shape=record, label="<b>BB3| { 21: add (16) (20) }}"];
+BB4 [shape=record, label="<b>BB4| { 22: phi (15) (32) | 23: phi (16) (33) | 24: cmp (22) (3) | 25: bge (24) (38) }}"];
+BB5 [shape=record, label="<b>BB5| { 26: mul (4) (3) | 27: mul (6) (21) | 28: add (26) (27) | 29: mul (28) (0) | 30: adda (29) (11) | 31: load (30) | 32: add (31) (23) }}"];
+BB6 [shape=record, label="<b>BB6| { 33: phi (23) (36) | 34: cmp (33) (17) | 35: bge (34) (37) }}"];
+BB7 [shape=record, label="<b>BB7| { 36: add (31) (33) }}"];
+BB8 [shape=record, label="<b>BB8| { 37:  }}"];
+BB9 [shape=record, label="<b>BB9| { 38: add (22) (20) }}"];
+BB10 [shape=record, label="<b>BB10| { 39: write (3) | 40: write (15) | 41: write (14) | 42: write (16) | 43: mul (4) (3) | 44: mul (6) (14) | 45: add (43) (44) | 46: mul (45) (0) | 47: adda (46) (11) | 48: load (47) | 49: write (48) | 50: end }}"];
+BB0:s -> BB1:n;
+BB1:s -> BB2:n;
+BB2:s -> BB3:n [label="fall-through"];
+BB3:s -> BB4:n;
+BB4:s -> BB5:n [label="fall-through"];
+BB5:s -> BB6:n;
+BB6:s -> BB7:n [label="fall-through"];
+BB7:s -> BB6:n [label="fall-through"];
+BB6:s -> BB8:n [label="follow"];
+BB8:s -> BB4:n [label="fall-through"];
+BB4:s -> BB9:n [label="follow"];
+BB9:s -> BB2:n [label="fall-through"];
+BB2:s -> BB10:n [label="follow"];
+}
+
+
+
+s = """main 
+        var x,y,i,j; 
+        array[4][3] a; 
+        {
+            let i<-call InputNum(); 
+            let x<-0; 
+            let y<-0; 
+            let j<- i; 
+            let a[x][j] <- i;
+            while x<10 do  
+                let x <- i + 1; 
+                if x > 0 then 
+                    let x <- j + 1 
+                else 
+                    let y <- a[x][j] + 1
+                fi; 
+                let i <-i + 1 
+            od; 
+            call OutputNum(x);
+            call OutputNum(y);
+            call OutputNum(j);
+            call OutputNum(i);
+            call OutputNum(a[x][j])
+        }."""
+
+digraph G{
+BB0 [shape=record, label="<b>BB0| { 0: const #4 | 1: const a_adr | 3: const #0 | 4: const #3 | 14: const #10 | 17: const #1 }}"];
+BB1 [shape=record, label="<b>BB1| { 2: read | 5: mul (4) (3) | 6: add (5) (2) | 7: mul (6) (0) | 8: add #BASE (1) | 9: adda (7) (8) | 10: store (9) (2) }}"];
+BB2 [shape=record, label="<b>BB2| { 11: phi (3) (22) | 12: phi (3) (30) | 13: phi (2) (31) | 15: cmp (11) (14) | 16: bge (15) (32) }}"];
+BB3 [shape=record, label="<b>BB3| { 18: add (13) (17) | 19: cmp (18) (3) | 20: ble (19) (24) }}"];
+BB4 [shape=record, label="<b>BB4| { 21: add (2) (17) | 23: bra (22) }}"];
+BB5 [shape=record, label="<b>BB5| { 24: mul (4) (18) | 25: add (24) (2) | 26: mul (25) (0) | 27: adda (26) (8) | 28: load (27) | 29: add (28) (17) }}"];
+BB6 [shape=record, label="<b>BB6| { 22: phi (21) (18) | 30: phi (12) (29) | 31: add (13) (17) }}"];
+BB7 [shape=record, label="<b>BB7| { 32: write (11) | 33: write (12) | 34: write (2) | 35: write (13) | 36: mul (4) (11) | 37: add (36) (2) | 38: mul (37) (0) | 39: adda (38) (8) | 40: load (39) | 41: write (40) | 42: end }}"];
+BB0:s -> BB1:n;
+BB1:s -> BB2:n;
+BB2:s -> BB3:n [label="fall-through"];
+BB3:s -> BB4:n [label="fall-through"];
+BB3:s -> BB5:n [label="branch"];
+BB4:s -> BB6:n [label="branch"];
+BB5:s -> BB6:n [label="fall-through"];
+BB6:s -> BB2:n [label="fall-through"];
+BB2:s -> BB7:n [label="follow"];
+}   
+
+
+
+s = """
+        main 
+        var x,y,i,j; 
+        array[4][3] a;
+        {
+            let i<-call InputNum();
+            let x<-0; 
+            let y<-0; 
+            let j<- i; 
+            let a[y][i] <- i;
+            if j < 0 then 
+                let j <- x + 1; 
+                let x <- a[y][i] + 1; 
+                while x<10 do 
+                    let x <- x + 1 ; 
+                od; 
+            else 
+                let i <-i + 1;
+                let y <- i + 1 
+            fi;
+            call OutputNum(x);
+            call OutputNum(y);
+            call OutputNum(j);
+            call OutputNum(i);
+            call OutputNum(a[y][i])
+        }."""
+        self.s = s
+
+digraph G{
+BB0 [shape=record, label="<b>BB0| { 0: const #4 | 1: const a_adr | 3: const #0 | 4: const #3 | 13: const #1 | 19: const #10 }}"];
+BB1 [shape=record, label="<b>BB1| { 2: read | 5: mul (4) (3) | 6: add (5) (2) | 7: mul (6) (0) | 8: add #BASE (1) | 9: adda (7) (8) | 10: store (9) (2) | 11: cmp (2) (3) | 12: bge (11) (24) }}"];
+BB2 [shape=record, label="<b>BB2| { 14: add (3) (13) | 16: add (10) (13) }}"];
+BB3 [shape=record, label="<b>BB3| { 18: phi (16) (22) | 20: cmp (18) (19) | 21: bge (20) (23) }}"];
+BB4 [shape=record, label="<b>BB4| { 22: add (18) (13) }}"];
+BB5 [shape=record, label="<b>BB5| { 23: bra (15) }}"];
+BB6 [shape=record, label="<b>BB6| { 24: add (2) (13) | 26: add (24) (13) }}"];
+BB7 [shape=record, label="<b>BB7| { 15: phi (14) (2) | 17: phi (18) (3) | 25: phi (2) (24) | 27: phi (3) (26) | 28: write (17) | 29: write (27) | 30: write (15) | 31: write (25) | 32: mul (4) (27) | 33: add (32) (25) | 34: mul (33) (0) | 35: adda (34) (8) | 36: load (35) | 37: write (36) | 38: end }}"];
+BB0:s -> BB1:n;
+BB1:s -> BB2:n [label="fall-through"];
+BB2:s -> BB3:n;
+BB3:s -> BB4:n [label="fall-through"];
+BB4:s -> BB3:n [label="fall-through"];
+BB3:s -> BB5:n [label="follow"];
+BB1:s -> BB6:n [label="branch"];
+BB5:s -> BB7:n [label="branch"];
+BB6:s -> BB7:n [label="fall-through"];
+}
+
+
+
+s = """
+        main 
+        var x,y,i,j; 
+        array[4][3] a;
+        {
+            let i<-call InputNum();
+            let x<-0; 
+            let y<-0; 
+            let j<- i; 
+            let a[y][i] <- i;
+            if j < 0 then 
+                let j <- x + 1; 
+                while x<10 do 
+                    let a[y][i] <- a[y][i] + 1 ; 
+                    let x <- a[y][i] + 1; 
+                od; 
+            else 
+                let i <-i + 1;
+                let y <- i + 1 
+            fi;
+            call OutputNum(x);
+            call OutputNum(y);
+            call OutputNum(j);
+            call OutputNum(i);
+            call OutputNum(a[y][i])
+        }."""
+
+digraph G{
+BB0 [shape=record, label="<b>BB0| { 0: const #4 | 1: const a_adr | 3: const #0 | 4: const #3 | 13: const #1 | 17: const #10 }}"];
+BB1 [shape=record, label="<b>BB1| { 2: read | 5: mul (4) (3) | 6: add (5) (2) | 7: mul (6) (0) | 8: add #BASE (1) | 9: adda (7) (8) | 10: store (9) (2) | 11: cmp (2) (3) | 12: bge (11) (31) }}"];
+BB2 [shape=record, label="<b>BB2| { 14: add (3) (13) }}"];
+BB3 [shape=record, label="<b>BB3| { 16: phi (3) (27) | 18: cmp (16) (17) | 19: bge (18) (28) }}"];
+BB4 [shape=record, label="<b>BB4| { 20: mul (4) (3) | 21: add (20) (2) | 22: mul (21) (0) | 23: adda (22) (8) | 24: load (23) | 25: add (24) (13) | 26: store (23) (25) | 27: add (26) (13) }}"];
+BB5 [shape=record, label="<b>BB5| { 28: kill a | 30: bra (15) }}"];
+BB6 [shape=record, label="<b>BB6| { 31: add (2) (13) | 33: add (31) (13) }}"];
+BB7 [shape=record, label="<b>BB7| { 15: phi (14) (2) | 29: phi (16) (3) | 32: phi (2) (31) | 34: phi (3) (33) | 35: write (29) | 36: write (34) | 37: write (15) | 38: write (32) | 39: mul (4) (34) | 40: add (39) (32) | 41: mul (40) (0) | 42: adda (41) (8) | 43: load (42) | 44: write (43) | 45: end }}"];
+BB0:s -> BB1:n;
+BB1:s -> BB2:n [label="fall-through"];
+BB2:s -> BB3:n;
+BB3:s -> BB4:n [label="fall-through"];
+BB4:s -> BB3:n [label="fall-through"];
+BB3:s -> BB5:n [label="follow"];
+BB1:s -> BB6:n [label="branch"];
+BB5:s -> BB7:n [label="branch"];
+BB6:s -> BB7:n [label="fall-through"];
+}
+
+
+s = """
+main 
+var x,y,i,j; 
+array[4] a; 
+{
+    let i<-call InputNum(); 
+    let x<-0; 
+    let y<-0; 
+    let j<-i; 
+    let a[x] <- i; 
+    while a[x]<10 do 
+        let j <- i + 1; 
+        let a[x] <- a[x] + 1; 
+        let i <-i + 1 
+    od; 
+    call OutputNum(j); 
+    call OutputNum(a[x])
+}."""
+
+digraph G{
+BB0 [shape=record, label="<b>BB0| { 0: const #4 | 1: const a_adr | 3: const #0 | 14: const #10 | 17: const #1 }}"];
+BB1 [shape=record, label="<b>BB1| { 2: read | 4: mul (3) (0) | 5: add #BASE (1) | 6: adda (4) (5) | 7: store (6) (2) }}"];
+BB2 [shape=record, label="<b>BB2| { 8: phi (2) (18) | 9: phi (2) (18) | 10: kill a | 11: mul (3) (0) | 12: adda (11) (5) | 13: load (12) | 15: cmp (13) (14) | 16: bge (15) (21) }}"];
+BB3 [shape=record, label="<b>BB3| { 18: add (9) (17) | 19: add (13) (17) | 20: store (12) (19) }}"];
+BB4 [shape=record, label="<b>BB4| { 21: write (8) | 22: write (13) | 23: end }}"];
+BB0:s -> BB1:n;
+BB1:b -> BB2:n [color=blue,style=dotted,label="dom"];
+BB1:s -> BB2:n;
+BB2:b -> BB3:n [color=blue,style=dotted,label="dom"];
+BB2:s -> BB3:n [label="fall-through"];
+BB3:s -> BB2:n [label="fall-through"];
+BB2:b -> BB4:n [color=blue,style=dotted,label="dom"];
+BB2:s -> BB4:n [label="follow"];
+}
+
+
